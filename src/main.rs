@@ -8,7 +8,7 @@ fn main() {
 
     if args.len() == 0 {
         let default_path = Path::new("./");
-        display_dir_content(&default_path);
+        display_dir_content(&default_path, false);
     } else {
         for arg in args {
             // There is not builtin feature to expand "~/" in paths, so let's do it by hand
@@ -31,18 +31,18 @@ fn main() {
                 println!("{} is not a directory\n", path.display());
                 continue;
             }
-
-            println!("mess in {}:", path.display());
-            display_dir_content(&path);
-            println!("");
+            display_dir_content(&path, true);
         }
     }
 }
 
-fn display_dir_content(path: &Path) {
-    if path.is_dir() == false {
-        println!("not a dir: {}", path.display());
-        return;
+/// Display the content of a directory.
+///
+/// * `path`: the path of the directory
+/// * `show_path`: if true, display the path of the directory before showing its mess
+fn display_dir_content(path: &Path, show_path: bool) {
+    if show_path == true {
+        println!("mess in {}:", path.display());
     }
 
     if path.join(".git/").is_dir() == true {
@@ -53,9 +53,11 @@ fn display_dir_content(path: &Path) {
     for child_path in fs::read_dir(&path).unwrap() {
         let child_path = child_path.unwrap().path();
         if child_path.is_dir() == true {
-            display_dir_content(&child_path);
+            display_dir_content(&child_path, false);
         } else {
             println!("file: {}", child_path.display())
         }
     }
+
+    println!("");
 }
