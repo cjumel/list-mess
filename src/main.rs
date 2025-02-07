@@ -27,10 +27,6 @@ fn main() {
             };
 
             let path = Path::new(fixed_arg);
-            if path.is_dir() == false {
-                println!("{} is not a directory\n", path.display());
-                continue;
-            }
             display_dir_content(&path, true);
         }
     }
@@ -41,12 +37,20 @@ fn main() {
 /// * `path`: the path of the directory
 /// * `show_path`: if true, display the path of the directory before showing its mess
 fn display_dir_content(path: &Path, show_path: bool) {
+    if path.is_dir() == false {
+        println!("{} is not a directory", path.display());
+        return;
+    }
     if show_path == true {
         println!("mess in {}:", path.display());
     }
 
+    if path.join(".messexclude").is_file() == true {
+        println!("excluded: {}", path.display());
+        return;
+    }
     if path.join(".git/").is_dir() == true {
-        println!("git repo: {}", path.display());
+        println!("git repository: {}", path.display());
         return;
     }
 
@@ -58,6 +62,4 @@ fn display_dir_content(path: &Path, show_path: bool) {
             println!("file: {}", child_path.display())
         }
     }
-
-    println!("");
 }
