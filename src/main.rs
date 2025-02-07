@@ -11,7 +11,22 @@ fn main() {
         display_dir_content(&default_path);
     } else {
         for arg in args {
-            let path = Path::new(arg);
+            // There is not builtin feature to expand "~/" in paths, so let's do it by hand
+            let fixed_arg = {
+                if arg.starts_with("~/") {
+                    &[
+                        // WARN: this won't work on Windows due to `env::home_dir()`
+                        #[allow(deprecated)]
+                        env::home_dir().unwrap().to_str().unwrap(),
+                        arg.strip_prefix("~").unwrap(),
+                    ]
+                    .join("")
+                } else {
+                    arg
+                }
+            };
+
+            let path = Path::new(fixed_arg);
             if path.is_dir() == false {
                 println!("{} is not a directory\n", path.display());
                 continue;
