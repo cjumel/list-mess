@@ -11,24 +11,27 @@ fn main() {
         display_dir_content(&default_path, false);
     } else {
         for arg in args {
-            // There is not builtin feature to expand "~/" in paths, so let's do it by hand
-            let fixed_arg = {
-                if arg.starts_with("~/") {
-                    &[
-                        // WARN: this won't work on Windows due to `env::home_dir()`
-                        #[allow(deprecated)]
-                        env::home_dir().unwrap().to_str().unwrap(),
-                        arg.strip_prefix("~").unwrap(),
-                    ]
-                    .join("")
-                } else {
-                    arg
-                }
-            };
-
-            let path = Path::new(fixed_arg);
+            let arg = expand_arg_path(arg);
+            let path = Path::new(&arg);
             display_dir_content(&path, true);
         }
+    }
+}
+
+/// Expand the home directory symbol ("~") in the provided path.
+///
+/// * `arg`: the path argument
+fn expand_arg_path(arg: &String) -> String {
+    if arg.starts_with("~/") {
+        return [
+            // WARN: this won't work on Windows due to `env::home_dir()`
+            #[allow(deprecated)]
+            env::home_dir().unwrap().to_str().unwrap(),
+            arg.strip_prefix("~").unwrap(),
+        ]
+        .join("");
+    } else {
+        return String::from(arg);
     }
 }
 
