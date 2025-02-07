@@ -4,11 +4,23 @@ use std::path::Path;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() >= 2 {
-        let arg = &args[1]; // Index 0 corresponds to debuggging stuff
-        display_dir_content(&Path::new(&arg));
+    let args = &args[1..]; // Discard first argument, the path of the executable
+
+    if args.len() == 0 {
+        let default_path = Path::new("./");
+        display_dir_content(&default_path);
     } else {
-        display_dir_content(&Path::new("./"));
+        for arg in args {
+            let path = Path::new(arg);
+            if path.is_dir() == false {
+                println!("{} is not a directory\n", path.display());
+                continue;
+            }
+
+            println!("mess in {}:", path.display());
+            display_dir_content(&path);
+            println!("");
+        }
     }
 }
 
