@@ -84,41 +84,38 @@ fn display_file(path: &Path, ignore_patterns: &Vec<String>) {
     if match_ignore_patterns(&path, &ignore_patterns) {
         return;
     }
-    println!("file: {}", path.display())
+    println!("{} (file)", path.display())
 }
 
 /// Display the mess in the git repository `path`.
 ///
 /// * `path`: the path to the git repository
 fn display_git_repo(path: &Path) {
-    let mut has_mess = false;
-    let mut mess_output = Vec::new();
+    let mut mess_issues = Vec::new();
 
     let current_branch = get_current_git_branch(path);
     if let Some(branch) = current_branch {
         if branch != "main" && branch != "master" {
-            has_mess = true;
-            mess_output.push("    not on default branch".to_string());
+            mess_issues.push("not on default branch".to_string());
         }
     }
 
     let status_output = get_git_status(path);
     if !status_output.is_empty() {
-        has_mess = true;
-        mess_output.push("    files added, modified, or removed".to_string());
+        mess_issues.push("files added, modified, or removed".to_string());
     }
 
     let stash_count = get_stash_count(path);
     if stash_count > 0 {
-        has_mess = true;
-        mess_output.push("    stash is not empty".to_string());
+        mess_issues.push("stash is not empty".to_string());
     }
 
-    if has_mess {
-        println!("git repository: {}", path.display());
-        for line in mess_output {
-            println!("{}", line);
-        }
+    if !mess_issues.is_empty() {
+        println!(
+            "{} (git repository: {})",
+            path.display(),
+            mess_issues.join(", ")
+        );
     }
 }
 
