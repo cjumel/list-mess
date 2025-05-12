@@ -67,7 +67,7 @@ fn display_dir(path: &Path, ignore_patterns: &Vec<String>, arg: &String, show_ar
         } else if child_path.is_file() {
             display_file(&child_path, &ignore_patterns);
         } else {
-            println!("unknown element: {}", path.display())
+            println!("unknown element: {}", display_path(&child_path))
         }
     }
 
@@ -84,7 +84,7 @@ fn display_file(path: &Path, ignore_patterns: &Vec<String>) {
     if match_ignore_patterns(&path, &ignore_patterns) {
         return;
     }
-    println!("{} (file)", path.display())
+    println!("{} (file)", display_path(path))
 }
 
 /// Display the mess in the git repository `path`.
@@ -113,9 +113,21 @@ fn display_git_repo(path: &Path) {
     if !mess_issues.is_empty() {
         println!(
             "{} (git repository: {})",
-            path.display(),
+            display_path(path),
             mess_issues.join(", ")
         );
+    }
+}
+
+/// Format a path for display.
+///
+/// * `path`: the path to format
+fn display_path(path: &Path) -> String {
+    let path_str = path.display().to_string();
+    if path_str.starts_with("./") {
+        path_str[2..].to_string()
+    } else {
+        path_str
     }
 }
 
