@@ -95,7 +95,7 @@ fn display_git_repo(path: &Path) {
 
     let current_branch = get_current_git_branch(path);
     if let Some(branch) = current_branch {
-        if branch != "main" && branch != "master" {
+        if branch != "main" && branch != "master" && branch != "staging" {
             mess_issues.push("not on default branch".to_string());
         }
     }
